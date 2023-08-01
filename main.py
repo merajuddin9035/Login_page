@@ -5,7 +5,7 @@ import  os
 app=Flask(__name__)
 app.secret_key=os.urandom(24)
 
-conn=mysql.connector.connect(host="localhost",user="root",password="Meraj@9035",database="demo")
+conn=mysql.connector.connect(host="localhost",user="root",password="Meraj@9035",database="records")
 cursor=conn.cursor()
 
 @app.route('/')
@@ -28,7 +28,9 @@ def home():
 def login_validation():
     email=request.form.get('email')
     password=request.form.get('password')
-    cursor.execute("SELECT * FROM `users` WHERE `EMAIL` LIKE '{}' AND `PASSWORD` LIKE '{}' ".format(email,password))
+    cursor.execute("""INSERT INTO test1 (name, email, password) VALUES ('{}', '{}', '{}')""".format(name, email, password))
+
+
     users=cursor.fetchall()
     if len(users)>0:
 
@@ -43,11 +45,13 @@ def add_users():
     name=request.form.get('uname')
     email=request.form.get('uemail')
     password=request.form.get('upassword')
-    cursor.execute("""INSERT INTO 'users' ('user_id','name','email','password') VALUES
-    (NULL,'{}','{}','{}')""".format(name,email,password))
+
+    cursor.execute("INSERT INTO test1 (name, email, password) VALUES (%s, %s, %s)", (name, email, password))
+
     conn.commit()
 
-    cursor.execute("""SELECT * FROM `users` WHERE `email` LIKE `{}`""".format(email))
+    cursor.execute("""SELECT * FROM test1 WHERE email LIKE '{}'""".format(email))
+
     myuser=cursor.fetchall()
     session['user_id']=myuser[0][0]
     return redirect('/home')
